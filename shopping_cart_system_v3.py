@@ -34,12 +34,18 @@ def add_item():
             cart[item] = cart.get(item, 0) + quantity  # Add to cart or update quantity
             eg.msgbox(f"Added {quantity} x {item}.", "Item Added")  # Confirm addition
 
-# Function to remove a certain quantity of an item from the cart
+# Fixed Function to remove a certain quantity of an item from the cart
 def remove_item():
     if not cart:
         eg.msgbox("Your cart is empty.", "Remove Item")  # Show empty cart message
         return
-    item = eg.choicebox("Select an item to remove:", "Remove Item", list(cart.keys()))  # Choose item from cart
+    
+    # Handle case where cart has only one item (EasyGui needs 2+ choices)
+    if len(cart) == 1:
+        item = list(cart.keys())[0]
+    else:
+        item = eg.choicebox("Select an item to remove:", "Remove Item", list(cart.keys()))  # Choose item from cart
+    
     if item:
         quantity = eg.integerbox("Enter quantity to remove:", "Remove Quantity", lowerbound=1, upperbound=cart[item])  # Allow partial removal
         if quantity:
@@ -80,7 +86,7 @@ def save_cart():
 # Function to load cart from file if exists
 def load_cart():
     global cart
-    if os.path.exists(CART_FILE):
+    if os.path.exists(CART_FILE):   
         with open(CART_FILE, "r") as f:
             cart = json.load(f)  # Load cart from file
         eg.msgbox("Previous cart loaded.", "Cart Loaded")  # Confirm load
